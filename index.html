@@ -1,55 +1,110 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Volta Facil Oliver 10m</title>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Volta Facil Oliver - 10m Final</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{height:100vh;overflow:hidden;font-family:sans-serif}#map{height:100vh}
+*{margin:0;padding:0;box-sizing:border-box}
+body{height:100vh;overflow:hidden;font-family:sans-serif;background:#fff}
+#map{height:100vh;width:100vw}
 #topbar{position:absolute;top:0;left:0;right:0;z-index:1000;background:#fff;padding:10px;display:flex;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-.btn{flex:1;padding:16px;border:none;border-radius:16px;font-weight:900;font-size:15px}
-#btnStart{background:#22c55e;color:#fff}#btnStop{background:#ef4444;color:#fff;display:none}#btnBack{background:#3b82f6;color:#fff;display:none}
-#status{position:absolute;bottom:110px;left:50%;transform:translateX(-50%);z-index:1000;background:#000;color:#fff;padding:12px 20px;border-radius:20px;display:none;font-weight:700}
+.btn{flex:1;padding:16px;border:none;border-radius:16px;font-weight:900;font-size:15px;cursor:pointer}
+#btnStart{background:#22c55e;color:#fff}
+#btnStop{background:#ef4444;color:#fff;display:none}
+#btnBack{background:#3b82f6;color:#fff;display:none}
+#status{position:absolute;bottom:110px;left:50%;transform:translateX(-50%);z-index:1000;background:#000;color:#fff;padding:12px 20px;border-radius:20px;display:none;font-weight:700;text-align:center}
 #info{position:absolute;bottom:10px;left:10px;right:10px;z-index:1000;background:#fff;padding:12px;border-radius:14px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.15);font-size:14px}
-.jump{animation:jump var(--dur,.35s) ease}@keyframes jump{0%{transform:translateY(0)}30%{transform:translateY(-24px)}60%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+.avatar-wrap{width:80px;height:95px;position:relative}
+.avatar-wrap img{width:80px;height:95px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.walk{animation:walk.35s ease-in-out}
+@keyframes walk{0%{transform:translateY(0)}25%{transform:translateY(-8px)}50%{transform:translateY(0)}75%{transform:translateY(-4px)}100%{transform:translateY(0)}}
 .dust{position:absolute;bottom:4px;left:50%;width:32px;height:12px;background:radial-gradient(ellipse, rgba(160,150,130,.85) 0%, rgba(200,195,180,.55) 45%, transparent 70%);border-radius:50%;transform:translateX(-50%);opacity:0;pointer-events:none}
-.dust.show{animation:dustAnim.6s ease-out}@keyframes dustAnim{0%{opacity:0;transform:translateX(-50%) scale(.3)}20%{opacity:.9;transform:translateX(-50%) scale(1.3)}100%{opacity:0;transform:translateX(-85%) scale(2) translateY(5px)}}
+.dust.show{animation:dustAnim.6s ease-out}
+@keyframes dustAnim{0%{opacity:0;transform:translateX(-50%) scale(.3)}20%{opacity:.9;transform:translateX(-50%) scale(1.3)}100%{opacity:0;transform:translateX(-85%) scale(2) translateY(5px)}}
 #lock{position:absolute;inset:0;z-index:9999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:20px}
 #lockBox{background:#fff;width:100%;max-width:360px;border-radius:24px;padding:24px;text-align:center}
-#pass{width:100%;padding:16px;border:2px solid #e2e8f0;border-radius:14px;font-size:18px;text-align:center;font-weight:700}
-#btnOk{width:100%;margin-top:12px;padding:16px;background:#16a34a;color:#fff;border:none;border-radius:14px;font-weight:900;font-size:16px}
-#alertaRota{position:absolute;top:70px;left:10px;right:10px;z-index:2000;background:#ef4444;color:#fff;padding:18px;border-radius:18px;text-align:center;font-weight:900;font-size:18px;display:none;animation:piscar 0.5s infinite}
-@keyframes piscar{0%{opacity:1}50%{opacity:0.6}100%{opacity:1}}
-</style></head><body>
-<div id="lock"><div id="lockBox"><h1>🔒 Volta Fácil</h1><p>Senha do Oliver</p><input id="pass" type="password" placeholder="senha" /><button id="btnOk" onclick="check()">ENTRAR</button><div id="err" style="color:#ef4444;margin-top:10px;display:none">Senha errada!</div></div></div>
+#pass{width:100%;padding:16px;border:2px solid #e2e8f0;border-radius:14px;font-size:18px;text-align:center;font-weight:700;outline:none}
+#btnOk{width:100%;margin-top:12px;padding:16px;background:#16a34a;color:#fff;border:none;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer}
+#alertaRota{position:absolute;top:70px;left:10px;right:10px;z-index:2000;background:#ef4444;color:#fff;padding:18px;border-radius:18px;text-align:center;font-weight:900;font-size:18px;display:none;animation:piscar.5s infinite}
+@keyframes piscar{0%{opacity:1}50%{opacity:.6}100%{opacity:1}}
+</style>
+</head>
+<body>
+<div id="lock"><div id="lockBox"><h1>🔒 Volta Fácil</h1><p style="margin:10px 0">Senha do Oliver</p><input id="pass" type="password" placeholder="senha" /><button id="btnOk" onclick="check()">ENTRAR</button><div id="err" style="color:#ef4444;margin-top:10px;display:none;font-weight:700">Senha errada!</div></div></div>
 <div id="alertaRota">⚠️ VOCÊ SAIU DA ROTA!</div>
 <div id="topbar"><button id="btnStart" class="btn">🟢 COMECAR IDA</button><button id="btnStop" class="btn">🔴 PARAR</button><button id="btnBack" class="btn">🔵 VOLTAR</button></div>
-<div id="map"></div><div id="status"></div><div id="info">Volta Fácil - 10m alerta</div>
+<div id="map"></div>
+<div id="status"></div>
+<div id="info">Pronto - 10m alerta + linha fina</div>
 <script>
 const SENHA="oliver123";
-function check(){let v=document.getElementById("pass").value;if(v===SENHA){document.getElementById("lock").style.display="none";localStorage.setItem("vf_ok","1");}else{document.getElementById("err").style.display="block";}}
-if(localStorage.getItem("vf_ok")==="1") document.getElementById("lock").style.display="none";
+function check(){
+  let v=document.getElementById("pass").value;
+  if(v===SENHA){
+    document.getElementById("lock").style.display="none";
+    localStorage.setItem("vf_ok","1");
+  }else{
+    document.getElementById("err").style.display="block";
+  }
+}
+if(localStorage.getItem("vf_ok")==="1"){
+  document.getElementById("lock").style.display="none";
+}
 document.getElementById("pass").addEventListener("keydown",e=>{if(e.key==="Enter") check()});
+
 const ZAPNUM="5527998265267";
-let map=L.map("map",{zoomControl:false}).setView([-20.32,-40.33],17);
+let map=L.map("map",{zoomControl:false}).setView([-20.3201,-40.3385],17);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
+
 let route=[],idaRoute=[],poly=null,polyBorder=null,marker=null,watch=null,lastJump=null,total=0,cnt=0,modo="parado",foraDaRota=false;
 const LIMITE_FORA_ROTA=10;
 
-function speak(t){try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="pt-BR";u.rate=1.1;speechSynthesis.speak(u);}catch(e){}}
-function show(t){let e=document.getElementById("status");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",4000);}
-function sendZap(tipo,lat,lng){let msg=tipo==="ida"?`🟢 *Oliver INICIOU A IDA*%0Ahttps://www.google.com/maps?q=${lat},${lng}`:`🔵 *Oliver COMECOU A VOLTA*%0Ahttps://www.google.com/maps?q=${lat},${lng}`;window.open(`https://wa.me/${ZAPNUM}?text=${msg}`,"_blank");}
-function jumpAnim(speed){let wrap=document.querySelector(".avatar-wrap");if(!wrap) return;let dust=wrap.querySelector(".dust");let d=Math.max(0.12,0.45-speed*0.03);wrap.style.setProperty("--dur",d+"s");wrap.classList.remove("jump");void wrap.offsetWidth;wrap.classList.add("jump");if(dust){dust.classList.remove("show");void dust.offsetWidth;dust.classList.add("show");}}
+function speak(t){
+  try{
+    speechSynthesis.cancel();
+    let u=new SpeechSynthesisUtterance(t);
+    u.lang="pt-BR";u.rate=1.1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function show(t){
+  let e=document.getElementById("status");
+  e.textContent=t;e.style.display="block";
+  setTimeout(()=>e.style.display="none",4000);
+}
+function sendZap(tipo,lat,lng){
+  let msg=tipo==="ida"?`🟢 *Oliver INICIOU A IDA*%0Ahttps://www.google.com/maps?q=${lat},${lng}`:`🔵 *Oliver COMECOU A VOLTA*%0Ahttps://www.google.com/maps?q=${lat},${lng}`;
+  window.open(`https://wa.me/${ZAPNUM}?text=${msg}`,"_blank");
+}
+function walkAnim(){
+  let wrap=document.querySelector(".avatar-wrap");
+  if(!wrap) return;
+  let dust=wrap.querySelector(".dust");
+  wrap.classList.remove("walk");
+  void wrap.offsetWidth;
+  wrap.classList.add("walk");
+  if(dust){
+    dust.classList.remove("show");
+    void dust.offsetWidth;
+    dust.classList.add("show");
+  }
+}
 function distanciaDaRota(lat,lng){
- if(idaRoute.length<2) return 0;
- let menor=Infinity;
- for(let i=0;i<idaRoute.length;i++){
-  let d=map.distance([lat,lng],idaRoute[i]);
-  if(d<menor) menor=d;
- }
- return menor;
+  if(idaRoute.length<2) return 0;
+  let menor=Infinity;
+  for(let i=0;i<idaRoute.length;i++){
+    let d=map.distance([lat,lng],idaRoute[i]);
+    if(d<menor) menor=d;
+  }
+  return menor;
 }
 function addPt(lat,lng){
- if(route.length>0){
-  let dist=map.distance(route[route.length-1],[lat,lng]);if(dist>30) return;
-  total+=dist;
-  if(lastJump==null) lastJump=[lat,lng
+  if(route.length>0){
+    let dist=map.distance(route[route.length-1],[lat,lng]);
+    if(dist>30) return;
+    total+=dist;
+    if(lastJump==null) lastJump=[lat,lng];
+    if(map.distance(lastJump,[lat,lng
