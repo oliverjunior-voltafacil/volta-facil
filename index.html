@@ -1,65 +1,53 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>VOLTA FÁCIL</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ff88">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>VOLTA FACIL</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#00ff88;font-family:Arial;overflow:hidden;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
-h1{font-size:32px;letter-spacing:2px;margin-bottom:10px}
-#game{width:90vw;max-width:400px;height:60vh;background:#111;border:2px solid #00ff88;border-radius:15px;position:relative;overflow:hidden}
-#player{width:40px;height:40px;background:#00ff88;border-radius:10px;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);transition:.1s}
-.enemy{width:40px;height:40px;background:#ff0044;position:absolute;top:-50px;border-radius:8px}
-#score{margin:15px;font-size:20px}
-#btnJogar{background:#00ff88;color:#000;border:none;padding:15px 50px;border-radius:30px;font-size:20px;font-weight:bold;margin-top:15px}
+body{margin:0;background:#000;color:#0f0;font-family:Arial;text-align:center;overflow:hidden}
+h1{color:#00ff88;margin-top:20px;font-size:36px}
+#score{font-size:22px;margin:10px}
+#game{width:90%;max-width:380px;height:60vh;background:#111;border:3px solid #00ff88;margin:0 auto;border-radius:15px;position:relative;overflow:hidden}
+#player{width:45px;height:45px;background:#00ff88;border-radius:12px;position:absolute;bottom:15px;left:45%;}
+.enemy{width:40px;height:40px;background:#ff2040;position:absolute;top:-50px;border-radius:10px}
+button{background:#00ff88;color:#000;border:0;padding:16px 60px;border-radius:30px;font-size:22px;font-weight:bold;margin-top:15px}
 </style>
 </head>
 <body>
 <h1>VOLTA FACIL</h1>
 <div id="score">Pontos: 0</div>
 <div id="game"><div id="player"></div></div>
-<button id="btnJogar" onclick="startGame()">JOGAR</button>
+<button onclick="iniciar()">JOGAR</button>
 <script>
-let score=0, gameOn=false, playerX=50, enemies=[];
-const game=document.getElementById('game'), player=document.getElementById('player'), scoreEl=document.getElementById('score');
-function startGame(){
- score=0; enemies=[]; gameOn=true;
+let pts=0,ativo=false,px=45,obs=[];
+let game=document.getElementById('game'),player=document.getElementById('player'),score=document.getElementById('score');
+function iniciar(){
+ pts=0; obs=[]; ativo=true;
  document.querySelectorAll('.enemy').forEach(e=>e.remove());
- document.getElementById('btnJogar').innerText='JOGANDO...';
- loop(); spawn();
+ criar(); rodar();
 }
-function spawn(){
- if(!gameOn) return;
- let e=document.createElement('div'); e.className='enemy';
- e.style.left=Math.random()*320+'px'; game.appendChild(e);
- enemies.push({el:e,y:-50,x:parseInt(e.style.left)});
- setTimeout(spawn,800);
+function criar(){
+ if(!ativo) return;
+ let d=document.createElement('div'); d.className='enemy';
+ d.style.left=Math.random()*85+'%'; game.appendChild(d);
+ obs.push({el:d,y:-50,x:parseFloat(d.style.left)});
+ setTimeout(criar,700);
 }
-function loop(){
- if(!gameOn) return;
- score++; scoreEl.innerText='Pontos: '+score;
- enemies.forEach((en,i)=>{
-   en.y+=5; en.el.style.top=en.y+'px';
-   if(en.y>500){en.el.remove(); enemies.splice(i,1)}
-   let px=playerX*3.2, py=420;
-   if(Math.abs(en.x-px)<35 && Math.abs(en.y-py)<35){
-     gameOn=false; alert('Bateu! Pontos: '+score+' - Vamos voltar fácil de novo?');
-     document.getElementById('btnJogar').innerText='JOGAR DE NOVO';
-   }
+function rodar(){
+ if(!ativo) return;
+ pts++; score.innerText='Pontos: '+pts;
+ obs.forEach((o,i)=>{
+   o.y+=6; o.el.style.top=o.y+'px';
+   if(o.y>500){o.el.remove(); obs.splice(i,1)}
+   if(o.y>300 && o.y<460 && Math.abs(o.x-px)<12){ativo=false; alert('BATEU! Fez '+pts+' pontos!');}
  });
- requestAnimationFrame(loop);
+ requestAnimationFrame(rodar);
 }
 game.addEventListener('touchmove',e=>{
- let t=e.touches[0].clientX-game.getBoundingClientRect().left;
- playerX=Math.max(5,Math.min(90,t/4)); player.style.left=playerX+'%';
-});
-game.addEventListener('mousemove',e=>{
- let t=e.clientX-game.getBoundingClientRect().left;
- playerX=Math.max(5,Math.min(90,t/4)); player.style.left=playerX+'%';
-});
+ px=(e.touches[0].clientX-game.getBoundingClientRect().left)/game.clientWidth*100;
+ player.style.left=px+'%';
+},{passive:false});
 </script>
 </body>
 </html>
