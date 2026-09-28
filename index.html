@@ -1,53 +1,70 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>VOLTA FACIL</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Volta Facil Oliver</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-body{margin:0;background:#000;color:#0f0;font-family:Arial;text-align:center;overflow:hidden}
-h1{color:#00ff88;margin-top:20px;font-size:36px}
-#score{font-size:22px;margin:10px}
-#game{width:90%;max-width:380px;height:60vh;background:#111;border:3px solid #00ff88;margin:0 auto;border-radius:15px;position:relative;overflow:hidden}
-#player{width:45px;height:45px;background:#00ff88;border-radius:12px;position:absolute;bottom:15px;left:45%;}
-.enemy{width:40px;height:40px;background:#ff2040;position:absolute;top:-50px;border-radius:10px}
-button{background:#00ff88;color:#000;border:0;padding:16px 60px;border-radius:30px;font-size:22px;font-weight:bold;margin-top:15px}
-</style>
-</head>
-<body>
-<h1>VOLTA FACIL</h1>
-<div id="score">Pontos: 0</div>
-<div id="game"><div id="player"></div></div>
-<button onclick="iniciar()">JOGAR</button>
+*{margin:0;padding:0;box-sizing:border-box}body{height:100vh;overflow:hidden;font-family:sans-serif}#map{height:100vh}
+#topbar{position:absolute;top:0;left:0;right:0;z-index:1000;background:#fff;padding:10px;display:flex;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.btn{flex:1;padding:16px;border:none;border-radius:16px;font-weight:900;font-size:15px}
+#btnStart{background:#22c55e;color:#fff}#btnStop{background:#ef4444;color:#fff;display:none}#btnBack{background:#3b82f6;color:#fff;display:none}
+#status{position:absolute;bottom:110px;left:50%;transform:translateX(-50%);z-index:1000;background:#000;color:#fff;padding:12px 20px;border-radius:20px;display:none;font-weight:700}
+#info{position:absolute;bottom:10px;left:10px;right:10px;z-index:1000;background:#fff;padding:12px;border-radius:14px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.15);font-size:14px}
+.avatar-wrap{width:70px;height:92px;position:relative}.avatar-wrap img{width:70px;height:92px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.jump{animation:jump var(--dur,.35s) ease}@keyframes jump{0%{transform:translateY(0)}30%{transform:translateY(-24px)}60%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+.dust{position:absolute;bottom:4px;left:50%;width:32px;height:12px;background:radial-gradient(ellipse, rgba(160,150,130,.85) 0%, rgba(200,195,180,.55) 45%, transparent 70%);border-radius:50%;transform:translateX(-50%);opacity:0;pointer-events:none}
+.dust.show{animation:dustAnim .6s ease-out}@keyframes dustAnim{0%{opacity:0;transform:translateX(-50%) scale(.3)}20%{opacity:.9;transform:translateX(-50%) scale(1.3)}100%{opacity:0;transform:translateX(-85%) scale(2) translateY(5px)}}
+</style></head><body>
+<div id="topbar"><button id="btnStart" class="btn">🟢 COMECAR IDA</button><button id="btnStop" class="btn">🔴 PARAR</button><button id="btnBack" class="btn">🔵 VOLTAR</button></div>
+<div id="map"></div><div id="status"></div><div id="info">Oliver - 1m pulinho + poeira + zap IDA/VOLTA</div>
 <script>
-let pts=0,ativo=false,px=45,obs=[];
-let game=document.getElementById('game'),player=document.getElementById('player'),score=document.getElementById('score');
-function iniciar(){
- pts=0; obs=[]; ativo=true;
- document.querySelectorAll('.enemy').forEach(e=>e.remove());
- criar(); rodar();
+const ZAPNUM="5527998265267";
+let map=L.map("map",{zoomControl:false}).setView([-20.32,-40.33],17);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
+let route=[],poly=null,marker=null,watch=null,lastJump=null,total=0,cnt=0;
+function speak(t){try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="pt-BR";u.rate=1.05;speechSynthesis.speak(u);}catch(e){}}
+function show(t){let e=document.getElementById("status");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",4000);}
+function sendZap(tipo,lat,lng){
+ let msg = tipo==="ida" ? `🟢 *Oliver INICIOU A IDA*%0A%0ATo entrando no mato! Me acompanhe ao vivo:%0Ahttps://www.google.com/maps?q=${lat},${lng}%0A%0A_Volta Facil_` : `🔵 *Oliver COMECOU A VOLTA*%0A%0ATo voltando pelo mesmo caminho! Me acompanhe:%0Ahttps://www.google.com/maps?q=${lat},${lng}%0A%0A_Volta Facil_`;
+ window.open(`https://wa.me/${ZAPNUM}?text=${msg}`,"_blank");
 }
-function criar(){
- if(!ativo) return;
- let d=document.createElement('div'); d.className='enemy';
- d.style.left=Math.random()*85+'%'; game.appendChild(d);
- obs.push({el:d,y:-50,x:parseFloat(d.style.left)});
- setTimeout(criar,700);
+function jumpAnim(speed){
+ let wrap=document.querySelector(".avatar-wrap"); if(!wrap) return;
+ let dust=wrap.querySelector(".dust");
+ let d=Math.max(0.12,0.45-speed*0.03); wrap.style.setProperty("--dur",d+"s");
+ wrap.classList.remove("jump"); void wrap.offsetWidth; wrap.classList.add("jump");
+ if(dust){dust.classList.remove("show"); void dust.offsetWidth; dust.classList.add("show");}
 }
-function rodar(){
- if(!ativo) return;
- pts++; score.innerText='Pontos: '+pts;
- obs.forEach((o,i)=>{
-   o.y+=6; o.el.style.top=o.y+'px';
-   if(o.y>500){o.el.remove(); obs.splice(i,1)}
-   if(o.y>300 && o.y<460 && Math.abs(o.x-px)<12){ativo=false; alert('BATEU! Fez '+pts+' pontos!');}
- });
- requestAnimationFrame(rodar);
+function addPt(lat,lng){
+ if(route.length>0){
+  let dist=map.distance(route[route.length-1],[lat,lng]); if(dist>30) return;
+  total+=dist;
+  if(lastJump==null) lastJump=[lat,lng];
+  if(map.distance(lastJump,[lat,lng])>=1){
+   let factor=Math.min(10,total/6); jumpAnim(factor); lastJump=[lat,lng]; cnt++;
+  }
+ }
+ route.push([lat,lng]);
+ if(!poly) poly=L.polyline(route,{color:"#22c55e",weight:22,lineCap:"round",lineJoin:"round"}).addTo(map); else poly.setLatLngs(route);
+ if(!marker){
+  let ic=L.divIcon({className:"",html:`<div class="avatar-wrap"><div style="font-size:56px">🏃‍♂️</div><div class="dust"></div></div>`,iconSize:[70,92],iconAnchor:[35,70]});
+  marker=L.marker([lat,lng],{icon:ic}).addTo(map);
+ } else marker.setLatLng([lat,lng]);
+ map.panTo([lat,lng]);
+ document.getElementById("info").innerHTML=`<b>${total.toFixed(0)}m</b> | ${cnt} pulos | poeira`;
 }
-game.addEventListener('touchmove',e=>{
- px=(e.touches[0].clientX-game.getBoundingClientRect().left)/game.clientWidth*100;
- player.style.left=px+'%';
-},{passive:false});
-</script>
-</body>
-</html>
+function startGPS(){watch=navigator.geolocation.watchPosition(p=>addPt(p.coords.latitude,p.coords.longitude),e=>show(e.message),{enableHighAccuracy:true,maximumAge:0,timeout:10000});}
+document.getElementById("btnStart").onclick=()=>{
+ route=[];total=0;cnt=0;lastJump=null; if(poly){map.removeLayer(poly);poly=null} if(marker){map.removeLayer(marker);marker=null}
+ document.getElementById("btnStart").style.display="none"; document.getElementById("btnStop").style.display="block";
+ speak("Iniciando gravação, iniciando o caminho"); show("🟢 IDA iniciada - enviando zap...");
+ navigator.geolocation.getCurrentPosition(pos=>{addPt(pos.coords.latitude,pos.coords.longitude); sendZap("ida",pos.coords.latitude,pos.coords.longitude); startGPS();},()=>startGPS(),{enableHighAccuracy:true});
+};
+document.getElementById("btnStop").onclick=()=>{if(watch) navigator.geolocation.clearWatch(watch); document.getElementById("btnStop").style.display="none"; document.getElementById("btnBack").style.display="block"; document.getElementById("btnStart").style.display="block"; speak("Gravação parada"); show("🔴 Parado");};
+document.getElementById("btnBack").onclick=()=>{
+ document.getElementById("btnBack").style.display="none"; document.getElementById("btnStart").style.display="none";
+ let b=document.createElement("button"); b.className="btn"; b.style.background="#111"; b.style.color="#fff"; b.textContent="🏁 CHEGUEI"; b.onclick=()=>location.reload(); document.getElementById("topbar").appendChild(b);
+ speak("Voltando pelo caminho. Siga a linha verde grossa"); show("🔵 VOLTA - enviando zap...");
+ navigator.geolocation.getCurrentPosition(pos=>{sendZap("volta",pos.coords.latitude,pos.coords.longitude); startGPS();},()=>startGPS(),{enableHighAccuracy:true});
+};
+</script></body></html>
