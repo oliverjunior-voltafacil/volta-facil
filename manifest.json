@@ -1,0 +1,15 @@
+{
+  "name": "Volta Facil",
+  "short_name": "VoltaFacil",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00ff88",
+  "icons": [
+    {
+      "src": "IMG-20260927-WA8889.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
