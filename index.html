@@ -2,16 +2,64 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volta Facil</title>
-<link rel="icon" href="IMG-20260927-WA8889.jpg">
-<link rel="apple-touch-icon" href="IMG-20260927-WA8889.jpg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>VOLTA FÁCIL</title>
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff88">
-<link rel="manifest" href="manifest.json">`
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#00ff88;font-family:Arial;overflow:hidden;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+h1{font-size:32px;letter-spacing:2px;margin-bottom:10px}
+#game{width:90vw;max-width:400px;height:60vh;background:#111;border:2px solid #00ff88;border-radius:15px;position:relative;overflow:hidden}
+#player{width:40px;height:40px;background:#00ff88;border-radius:10px;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);transition:.1s}
+.enemy{width:40px;height:40px;background:#ff0044;position:absolute;top:-50px;border-radius:8px}
+#score{margin:15px;font-size:20px}
+#btnJogar{background:#00ff88;color:#000;border:none;padding:15px 50px;border-radius:30px;font-size:20px;font-weight:bold;margin-top:15px}
+</style>
 </head>
-<body style="background:#000;color:#fff;font-family:Arial;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;text-align:center">
-<h1 style="color:#00ff88;font-size:40px">VOLTA FACIL</h1>
-<p>Ícone verde instalado ✅</p>
-<button onclick="alert('Vamos adicionar o jogo agora!')" style="margin-top:20px;padding:15px 30px;background:#00ff88;border:0;border-radius:12px;font-weight:bold;font-size:18px">JOGAR</button>
+<body>
+<h1>VOLTA FACIL</h1>
+<div id="score">Pontos: 0</div>
+<div id="game"><div id="player"></div></div>
+<button id="btnJogar" onclick="startGame()">JOGAR</button>
+<script>
+let score=0, gameOn=false, playerX=50, enemies=[];
+const game=document.getElementById('game'), player=document.getElementById('player'), scoreEl=document.getElementById('score');
+function startGame(){
+ score=0; enemies=[]; gameOn=true;
+ document.querySelectorAll('.enemy').forEach(e=>e.remove());
+ document.getElementById('btnJogar').innerText='JOGANDO...';
+ loop(); spawn();
+}
+function spawn(){
+ if(!gameOn) return;
+ let e=document.createElement('div'); e.className='enemy';
+ e.style.left=Math.random()*320+'px'; game.appendChild(e);
+ enemies.push({el:e,y:-50,x:parseInt(e.style.left)});
+ setTimeout(spawn,800);
+}
+function loop(){
+ if(!gameOn) return;
+ score++; scoreEl.innerText='Pontos: '+score;
+ enemies.forEach((en,i)=>{
+   en.y+=5; en.el.style.top=en.y+'px';
+   if(en.y>500){en.el.remove(); enemies.splice(i,1)}
+   let px=playerX*3.2, py=420;
+   if(Math.abs(en.x-px)<35 && Math.abs(en.y-py)<35){
+     gameOn=false; alert('Bateu! Pontos: '+score+' - Vamos voltar fácil de novo?');
+     document.getElementById('btnJogar').innerText='JOGAR DE NOVO';
+   }
+ });
+ requestAnimationFrame(loop);
+}
+game.addEventListener('touchmove',e=>{
+ let t=e.touches[0].clientX-game.getBoundingClientRect().left;
+ playerX=Math.max(5,Math.min(90,t/4)); player.style.left=playerX+'%';
+});
+game.addEventListener('mousemove',e=>{
+ let t=e.clientX-game.getBoundingClientRect().left;
+ playerX=Math.max(5,Math.min(90,t/4)); player.style.left=playerX+'%';
+});
+</script>
 </body>
 </html>
