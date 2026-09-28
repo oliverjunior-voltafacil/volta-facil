@@ -1,57 +1,51 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Volta Fácil</title>
+<title>Volta Facil</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:#0f1115;color:#fff;overflow:hidden}
-#login{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0f1115;z-index:99;padding:20px}
-#login h1{font-size:32px;margin-bottom:10px;color:#22c55e}
-#login input{padding:16px;width:100%;max-width:320px;border-radius:12px;border:2px solid #22c55e;background:#1a1d24;color:#fff;font-size:18px;margin:15px 0;text-align:center}
-#login button{padding:16px 40px;background:#22c55e;color:#000;border:none;border-radius:12px;font-weight:800;font-size:18px}
-#app{display:none;flex-direction:column;height:100vh}
-.header{padding:14px;background:#151821;display:flex;justify-content:space-between;align-items:center}
-.header b{color:#22c55e}
-#mapWrap{flex:1;position:relative;background:#e5e7eb;overflow:hidden}
-canvas{width:100%;height:100%;display:block}
-#avatar{position:absolute;width:56px;height:56px;transform:translate(-50%,-90%);transition:transform 0.1s;z-index:5;font-size:44px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
-.jump{animation:jump 0.35s ease}
-@keyframes jump{0%{transform:translate(-50%,-90%) scale(1)}50%{transform:translate(-50%,-140%) scale(1.2)}100%{transform:translate(-50%,-90%) scale(1)}}
-.dust{position:absolute;width:20px;height:8px;background:radial-gradient(#a3a3a3,transparent);border-radius:50%;animation:dust 0.4s forwards}
-@keyframes dust{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.5) translateY(10px);opacity:0}}
-.controls{padding:12px;background:#151821;display:flex;gap:10px}
-.controls button{flex:1;padding:14px;border-radius:12px;border:none;font-weight:800}
-#startBtn{background:#22c55e;color:#000}
-#zapBtn{background:#25D366;color:#000}
-.info{padding:10px 14px;background:#1e222d;font-size:14px;display:flex;justify-content:space-between}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:Arial;overflow:hidden}
+#login{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#boneco{position:relative;width:100px;height:140px;animation:pula 0.7s infinite}
+@keyframes pula{0%,100%{transform:translateY(0)}50%{transform:translateY(-45px)}}
+.cabeca{width:34px;height:34px;border:3px solid #fff;border-radius:50%;margin:0 auto}
+.corpo{width:4px;height:45px;background:#fff;margin:0 auto}
+.pernas{display:flex;justify-content:center;gap:24px}
+.perna{width:4px;height:32px;background:#fff}
+.poeira{position:absolute;bottom:-5px;left:25px;width:50px;height:12px;background:#666;border-radius:50%;animation:poeira 0.7s infinite}
+@keyframes poeira{0%{opacity:0;transform:scale(0)}50%{opacity:.7;transform:scale(1.6)}100%{opacity:0}}
+.linha{width:220px;height:10px;background:#00ff00;margin-top:15px;border-radius:10px;box-shadow:0 0 15px #0f0}
+input{margin-top:25px;padding:16px;width:85%;max-width:320px;border:2px solid #00ff00;border-radius:12px;background:#111;color:#fff;text-align:center;font-size:18px}
+button{margin-top:18px;background:#00ff00;color:#000;border:none;padding:16px 50px;border-radius:30px;font-weight:bold;font-size:18px}
+#app{display:none;padding:20px;text-align:center}
+.card{background:#111;border:1px solid #222;border-radius:15px;padding:20px;margin:15px 0}
 </style>
 </head>
 <body>
 <div id="login">
-<h1>Volta Fácil</h1>
-<p style="opacity:.7">Digite sua senha</p>
-<input id="pass" type="password" placeholder="senha">
+<div id="boneco"><div class="cabeca"></div><div class="corpo"></div><div class="pernas"><div class="perna" style="transform:rotate(20deg)"></div><div class="perna" style="transform:rotate(-20deg)"></div></div><div class="poeira"></div></div>
+<div class="linha"></div>
+<h1 style="color:#00ff00;margin-top:25px">Volta Facil</h1>
+<input id="s" type="password" placeholder="senha: oliver123">
 <button onclick="entrar()">ENTRAR</button>
-<p id="erro" style="color:#ef4444;margin-top:10px;display:none">Senha errada! Use oliver123</p>
+<p id="erro" style="color:red;margin-top:10px"></p>
 </div>
-
 <div id="app">
-<div class="header"><b>🔵 Volta Fácil • LIVE</b><span id="distTxt">0m</span></div>
-<div id="mapWrap">
-<canvas id="c"></canvas>
-<div id="avatar">🏃‍♂️</div>
+<h1 style="color:#00ff00">✅ Bem-vindo Oliver!</h1>
+<div class="card"><h3>Seu App Está ONLINE!</h3><p>oliverjunior-voltafacil.github.io/volta-facil/</p></div>
+<div class="card"><button onclick="location.reload()" style="width:100%;background:#0f0;padding:15px;border-radius:10px;font-weight:bold">Sair</button></div>
 </div>
-<div class="info"><span>📍 Serra-ES → Centro</span><span id="speed">0 km/h</span></div>
-<div class="controls">
-<button id="startBtn" onclick="iniciar()">▶️ INICIAR VOLTA</button>
-<button id="zapBtn" onclick="zap()">💬 WHATSAPP</button>
-</div>
-</div>
-
 <script>
 function entrar(){
- if(document.getElementById('pass').value==='oliver123'){
-  document.getElementById('login').style.display='none';
-  document.getElementById('app').style.display
+if(document.getElementById('s').value==='oliver123'){
+document.getElementById('login').style.display='none';
+document.getElementById('app').style.display='block';
+}else{
+document.getElementById('erro').innerText='Senha errada! Digite oliver123';
+}
+}
+</script>
+</body>
+</html>
