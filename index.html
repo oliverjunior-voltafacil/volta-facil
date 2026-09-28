@@ -2,50 +2,15 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Volta Facil</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:Arial;overflow:hidden}
-#login{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
-#boneco{position:relative;width:100px;height:140px;animation:pula 0.7s infinite}
-@keyframes pula{0%,100%{transform:translateY(0)}50%{transform:translateY(-45px)}}
-.cabeca{width:34px;height:34px;border:3px solid #fff;border-radius:50%;margin:0 auto}
-.corpo{width:4px;height:45px;background:#fff;margin:0 auto}
-.pernas{display:flex;justify-content:center;gap:24px}
-.perna{width:4px;height:32px;background:#fff}
-.poeira{position:absolute;bottom:-5px;left:25px;width:50px;height:12px;background:#666;border-radius:50%;animation:poeira 0.7s infinite}
-@keyframes poeira{0%{opacity:0;transform:scale(0)}50%{opacity:.7;transform:scale(1.6)}100%{opacity:0}}
-.linha{width:220px;height:10px;background:#00ff00;margin-top:15px;border-radius:10px;box-shadow:0 0 15px #0f0}
-input{margin-top:25px;padding:16px;width:85%;max-width:320px;border:2px solid #00ff00;border-radius:12px;background:#111;color:#fff;text-align:center;font-size:18px}
-button{margin-top:18px;background:#00ff00;color:#000;border:none;padding:16px 50px;border-radius:30px;font-weight:bold;font-size:18px}
-#app{display:none;padding:20px;text-align:center}
-.card{background:#111;border:1px solid #222;border-radius:15px;padding:20px;margin:15px 0}
-</style>
+<link rel="icon" href="IMG-20260927-WA8889.jpg">
+<link rel="apple-touch-icon" href="IMG-20260927-WA8889.jpg">
+<meta name="theme-color" content="#00ff88">
 </head>
-<body>
-<div id="login">
-<div id="boneco"><div class="cabeca"></div><div class="corpo"></div><div class="pernas"><div class="perna" style="transform:rotate(20deg)"></div><div class="perna" style="transform:rotate(-20deg)"></div></div><div class="poeira"></div></div>
-<div class="linha"></div>
-<h1 style="color:#00ff00;margin-top:25px">Volta Facil</h1>
-<input id="s" type="password" placeholder="senha: oliver123">
-<button onclick="entrar()">ENTRAR</button>
-<p id="erro" style="color:red;margin-top:10px"></p>
-</div>
-<div id="app">
-<h1 style="color:#00ff00">✅ Bem-vindo Oliver!</h1>
-<div class="card"><h3>Seu App Está ONLINE!</h3><p>oliverjunior-voltafacil.github.io/volta-facil/</p></div>
-<div class="card"><button onclick="location.reload()" style="width:100%;background:#0f0;padding:15px;border-radius:10px;font-weight:bold">Sair</button></div>
-</div>
-<script>
-function entrar(){
-if(document.getElementById('s').value==='oliver123'){
-document.getElementById('login').style.display='none';
-document.getElementById('app').style.display='block';
-}else{
-document.getElementById('erro').innerText='Senha errada! Digite oliver123';
-}
-}
-</script>
+<body style="background:#000;color:#fff;font-family:Arial;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;text-align:center">
+<h1 style="color:#00ff88;font-size:40px">VOLTA FACIL</h1>
+<p>Ícone verde instalado ✅</p>
+<button onclick="alert('Vamos adicionar o jogo agora!')" style="margin-top:20px;padding:15px 30px;background:#00ff88;border:0;border-radius:12px;font-weight:bold;font-size:18px">JOGAR</button>
 </body>
 </html>
